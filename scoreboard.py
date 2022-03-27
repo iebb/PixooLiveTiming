@@ -11,7 +11,8 @@ class Scoreboard:
     heartbeat_interval = 1
     display_lines = 8
     display_height = 8
-    pixoo = Pixoo(sys.argv[1], 64, True)
+    a = "" if len(sys.argv) == 1 else sys.argv[1]
+    pixoo = Pixoo(a, 64, True)
 
     def get_color_for_ranking(self, position):
         if position == 1:
@@ -22,7 +23,7 @@ class Scoreboard:
             return 199, 123, 48
         return 255, 255, 255
 
-    def update_screen(self):
+    async def update_screen(self):
         self.pixoo.fill((0, 0, 0))
         if len(self.scoreboard) == 0:
             return
@@ -54,9 +55,8 @@ class Scoreboard:
     async def heartbeat(self) -> None:
         while True:
             try:
-                t0 = time.time()
-                self.update_screen()
-                await asyncio.sleep(self.heartbeat_interval - (time.time() - t0))
+                asyncio.create_task(self.update_screen())
+                await asyncio.sleep(1)
             except asyncio.CancelledError:
                 break
 

@@ -64,6 +64,25 @@ class Pixoo:
     __counter = 0
 
     def __init__(self, address, size=64, debug=False):
+        if not address:
+            ret = requests.get("https://app.divoom-gz.com/Device/ReturnSameLANDevice").json()
+            devices = ret["DeviceList"]
+            if len(devices):
+                idx = 0
+                if len(devices) > 1:
+                    for i, d in enumerate(devices):
+                        print("%d - %s" % (i + 1, d["DeviceName"]))
+                    while True:
+                        try:
+                            idx = int(input("Choose a device: ")) - 1
+                            if idx >= 0:
+                                break
+                        except Exception:
+                            continue
+                address = devices[idx]["DevicePrivateIP"]
+            else:
+                raise Exception("no device found")
+
         assert size in [16, 32, 64], 'Invalid screen size in pixels given. Valid options are 16, 32, and 64'
 
         self.address = address
